@@ -58,8 +58,6 @@ OSEK OSEK {
 
    EVENT = POSIXE;
 
-   EVENT = evTon;
-
    APPMODE = AppMode1;
 
    TASK InitTask {
@@ -73,7 +71,6 @@ OSEK OSEK {
       SCHEDULE = NON;
       RESOURCE = POSIXR;
       EVENT = POSIXE;
-      EVENT = evTon;
    }
 
    TASK PeriodicTask {
@@ -90,14 +87,6 @@ OSEK OSEK {
       COUNTER = HardwareCounter;
       ACTION = ACTIVATETASK {
          TASK = PeriodicTask;
-      }
-   }
-
-   ALARM SetEvTon {
-      COUNTER = HardwareCounter;
-      ACTION = SETEVENT {
-         TASK = InitTask;
-         EVENT = evTon;
       }
    }
 

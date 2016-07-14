@@ -54,6 +54,7 @@
 /*==================[inclusions]=============================================*/
 #include "os.h"
 #include "ciaaPOSIX_stdio.h"
+#include "ciaaPOSIX_unistd.h"
 #include "glcd_ctrl_internal.h"
 
 /*==================[macros and definitions]=================================*/
@@ -150,9 +151,10 @@ static void glcd_NT7532_init()
    /*reset pin ????*/
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);     
 
-   SetRelAlarm(SetEvTon, 10, 0);
-   WaitEvent(evTon);
-   ClearEvent(evTon);
+   ciaaPOSIX_usleep(10000);
+   //SetRelAlarm(SetEvTon, 10, 0);
+   //WaitEvent(evTon);
+   //ClearEvent(evTon);
 
    glcd_NT7532_cmdWrite(NT7532_CMD_INTERNAL_RST);
    glcd_NT7532_cmdWrite(NT7532_CMD_SET_BIAS_9);                         // LCD Bias Select
@@ -167,9 +169,10 @@ static void glcd_NT7532_init()
    glcd_NT7532_cmdWrite(NT7532_CMD_DISP_ON);
    glcd_NT7532_cmdWrite(NT7532_CMD_SET_DISP_START_LINE);                // Initial Display Line
 
-	SetRelAlarm(SetEvTon, 10, 0);
-	WaitEvent(evTon);
-	ClearEvent(evTon);
+   ciaaPOSIX_usleep(10000);
+	//SetRelAlarm(SetEvTon, 10, 0);
+	//WaitEvent(evTon);
+	//ClearEvent(evTon);
 //   CMD(NT7532_CMD_SET_ALLPTS_NORMAL);
 //   st7565SetBrightness(0x18);
 }

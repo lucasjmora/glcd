@@ -44,6 +44,7 @@
 #include "ciaaPOSIX_stdio.h"  /* <= device handler header */
 #include "ciaaPOSIX_string.h" /* <= string header */
 #include "ciaak.h"            /* <= ciaa kernel header */
+#include "ciaaPOSIX_unistd.h"
 #include "glcd_graphic_lib.h"         /* <= own header */
 /*==================[macros and definitions]=================================*/
 
@@ -126,15 +127,15 @@ TASK(InitTask)
    ciaaLcd_fd = ciaaPOSIX_open("/dev/dio/out/0", ciaaPOSIX_O_RDWR);
 
    /* activate periodic task:
-    *  - for the first time after 350 ticks (350 ms)
-    *  - and then every 250 ticks (250 ms)
+    *  - for the first time after 0 ticks (0 ms)
+    *  - and then every 250 ticks (10 ms)
     */
-   SetRelAlarm(ActivatePeriodicTask, 350, 250);
+   SetRelAlarm(ActivatePeriodicTask, 5, 10);
 
    //glcd_NT7532_init();
    glcd_init();
    
-   ciaaLcd_NT7532_refresh();
+   //ciaaLcd_NT7532_refresh();
    
    //glcd_putPixel(1,0,0); 
    //glcd_putPixel(60,0,0); 
@@ -160,11 +161,12 @@ TASK(InitTask)
  */
 TASK(PeriodicTask)
 {
-   uint32_t outputs;
+   //uint32_t outputs;
 
    /* write blinking message */
-   ciaaPOSIX_printf("Blinking\n");
+   //ciaaPOSIX_printf("Blinking\n");
 
+   ciaaPOSIX_sleepMainFunction();
    /* blink output */
   // ciaaPOSIX_read(fd_out, &outputs, 1);
   // outputs ^= 0x20;
