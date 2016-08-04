@@ -89,8 +89,9 @@
 #define NT7532_CMD_TEST                   0xF0
 #define NT7532_CMD_TEST_RST               0xF0
 
-#define GLCD_DISPLAY_WIDTH  128
+#define GLCD_DISPLAY_WIDTH  129
 #define GLCD_DISPLAY_HEIGHT 64
+#define GLCD_FB_SIZE       (GLCD_DISPLAY_WIDTH * GLCD_DISPLAY_HEIGHT)
 /*==================[internal data declaration]==============================*/
 
 /*==================[internal functions declaration]=========================*/
@@ -101,7 +102,8 @@ static void glcd_NT7532_setPage(uint8_t data);
 static void glcd_NT7532_setColumn(uint8_t data);
 
 /*==================[internal data definition]===============================*/
-static uint32_t wr_buffer;
+static uint32_t wr_buffer; /* TODO: Best local in each function? */
+static uint8_t glcd_fb[GLCD_FB_SIZE];
 
 glcdModuleType glcd_NT7532 = {
    glcd_NT7532_init,
@@ -110,7 +112,8 @@ glcdModuleType glcd_NT7532 = {
    glcd_NT7532_setPage,
    glcd_NT7532_setColumn,
    GLCD_DISPLAY_WIDTH,
-   GLCD_DISPLAY_HEIGHT
+   GLCD_DISPLAY_HEIGHT,
+   glcd_fb
 };
 
 /*==================[external data definition]===============================*/
@@ -119,28 +122,32 @@ extern int32_t ciaaLcd_fd;
 /*==================[internal functions definition]==========================*/
 static void glcd_NT7532_cmdWrite(uint8_t cmd)                          
 {
-   wr_buffer = (0x0900 | cmd) << 8;               
-   ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);     
+   wr_buffer = (0x0900 | cmd) << 8;      /* 9 = 1001 */         
+   ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer, 3);     
 
    //SetRelAlarm(SetEvTon, 1, 0);
    //WaitEvent(evTon);
    //ClearEvent(evTon);
 
-   wr_buffer &= 0x0007FFFF;            
+   /* E to low */
+   wr_buffer &= 0x0007FFFF;
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);
 } 
 
+/* ...._dataBlockWrite(...) 
+ * set write data cmd and then send a train of bytes ????
+ */
+
 static void glcd_NT7532_dataWrite(uint8_t data)                        
 {
-   wr_buffer = (0x0b00 | data) << 8;              
-   ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);
+   wr_buffer = (0x0b00 | data) << 8;     /* b = 1011 */         
+   ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer, 3);
 
-   //SetRelAlarm(SetEvTon, 1, 0);
-   //WaitEvent(evTon);
-   //ClearEvent(evTon);
-
-   wr_buffer &= 0x0007FFFF;              
+   /* E to low */
+   wr_buffer &= 0x0007FFFF;
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);
+  
+//ciaaPOSIX_usleep(10000);
 } 
 
 static void glcd_NT7532_init()
@@ -202,30 +209,23 @@ extern glcdModuleType * glcd_addDriver(void)
 //}
 
 
-
-
-
-
-extern void ciaaLcd_NT7532_refresh()//, uint8_t * framebuffer)
+extern void ciaaLcd_NT7532_refresh()
 {
-  uint8_t c, p;
-  //int pagemap[] = { 3, 2, 1, 0, 7, 6, 5, 4 };
-
-  for(p = 0; p < 8; p++) 
-  {
-    glcd_NT7532_cmdWrite(NT7532_CMD_SET_PAGE | p);
-    //glcd_NT7532_cmdWrite(NT7532_CMD_SET_PAGE | pagemap[p]);
-    glcd_NT7532_cmdWrite(NT7532_CMD_SET_COLUMN_LOWER | (0x0 & 0xf));
-    glcd_NT7532_cmdWrite(NT7532_CMD_SET_COLUMN_UPPER | ((0x0 >> 4) & 0xf));
-   // glcd_NT7532_cmdWrite(NT7532_CMD_RMW);
-   // glcd_NT7532_dataWrite(0xf0);
-    
-    for(c = 0; c < 129; c++) 
-    {
-      //DATA(buffer[(128*p)+c]);
-      glcd_NT7532_dataWrite(0x00);
-    }
-  }
+   uint8_t col, p;
+   for(p = 0; p < 8; p++) 
+   {
+      glcd_NT7532_cmdWrite(NT7532_CMD_SET_PAGE | p);
+      glcd_NT7532_cmdWrite(NT7532_CMD_SET_COLUMN_UPPER);
+      glcd_NT7532_cmdWrite(NT7532_CMD_SET_COLUMN_LOWER);
+      
+      for(col = 0; col < 129; col++) 
+      {
+         ciaaPOSIX_printf("col: %i\n",col + 129 * p);
+         glcd_NT7532_dataWrite(glcd_fb[ col + 129 * p ]);
+      }
+      ciaaPOSIX_printf("page...................: %i\n",p);
+      ciaaPOSIX_usleep(10000);
+   }
 
 }
 

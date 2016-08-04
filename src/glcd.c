@@ -135,20 +135,21 @@ TASK(InitTask)
    //glcd_NT7532_init();
    glcd_init();
    
-   //ciaaLcd_NT7532_refresh();
-   
-   //glcd_putPixel(1,0,0); 
+//   ciaaLcd_NT7532_refresh();
+   glcd_clearScreen(GLCD_COLOR_BLACK);
+   ciaaLcd_NT7532_refresh();
+   //glcd_putPixel(61,61,0); 
    //glcd_putPixel(60,0,0); 
    //glcd_putPixel(100,0,0); 
    
-   uint8_t pix;
-   for (pix=0;pix<128;pix++)
-   {
-      glcd_putPixel(pix,31,0); 
-      if (pix < 64)
-         glcd_putPixel(63,pix,0); 
-   }
-
+//   uint8_t pix,piy=63;
+//   //for (piy = 50;piy < 64;piy++)
+//   //{
+//      for (pix=0;pix<129;pix++)
+//      {
+//         glcd_putPixel(pix,piy,0); 
+//      }
+   //}
    /* terminate task */
    TerminateTask();
 }

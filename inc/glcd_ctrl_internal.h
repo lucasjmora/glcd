@@ -77,6 +77,7 @@ typedef struct {
    glcd_setColumn setColumn;
    uint8_t glcd_display_width;
    uint8_t glcd_display_height;
+   uint8_t *glcd_framebuffer;
 }glcdModuleType;
 
 /*==================[external data declaration]==============================*/

@@ -110,7 +110,14 @@ void glcd_fillRect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, glcd_color_t 
 
 void glcd_clearScreen(glcd_color_t color)
 {
+   uint16_t i;
+   uint16_t fb_size = glcd->glcd_display_width * glcd->glcd_display_height;
+   uint8_t color_fill = ~(color * 0xff);
 
+   for (i=0; i < fb_size; i++)
+   {
+      *(glcd->glcd_framebuffer + i) = color_fill;
+   }
 }
 
 void glcd_putString(uint8_t x, uint8_t y, uint8_t *pStr, glcd_color_t fb, glcd_color_t bg)
