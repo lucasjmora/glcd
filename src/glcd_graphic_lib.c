@@ -55,6 +55,7 @@
 #include "os.h"
 #include "glcd_ctrl_internal.h"
 #include "glcd_graphic_lib.h"
+#include "font.c"
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data declaration]==============================*/
@@ -76,31 +77,100 @@ void glcd_init(void)
 
 void glcd_putPixel(uint8_t x, uint8_t y, glcd_color_t color)
 {
-   /* TODO: x and y range control */ 
+   /* TODO: x and y range control and color parameter implementation*/ 
    uint8_t page;
    uint8_t row_in_page;
    
    page = 7 - y / 8;
    row_in_page = 0x01 << (7 - y % 8);
+   *(glcd->glcd_framebuffer + (x + 129 * page)) |= row_in_page;
 
-   glcd->setPage(page);
-   glcd->setColumn(x);
-   glcd->dataWrite(row_in_page);
+//   glcd->setPage(page);
+//   glcd->setColumn(x);
+//   glcd->dataWrite(row_in_page);
 }
 
-void glcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, glcd_color_t color)
+/* Bresenham’s algorithm */
+void glcd_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, glcd_color_t colour)
 {
+    signed int dx = 0x0000;
+    signed int dy = 0x0000;
+    signed int stepx = 0x0000;
+    signed int stepy = 0x0000;
+    signed int fraction = 0x0000;
 
+    dy = (y2 - y1);
+    dx = (x2 - x1);
+
+    if(dy < 0)
+    {
+        dy = -dy;
+        stepy = -1;
+    }
+    else
+    {
+        stepy = 1;
+    }
+
+    if(dx < 0)
+    {
+        dx = -dx;
+        stepx = -1;
+    }
+    else
+    {
+        stepx = 1;
+    }
+
+    dx <<= 0x01;
+    dy <<= 0x01;
+
+    glcd_putPixel(x1, y1, colour);
+
+    if(dx > dy)
+    {
+        fraction = (dy - (dx >> 1));
+        while(x1 != x2)
+        {
+            if(fraction >= 0)
+            {
+                y1 += stepy;
+                fraction -= dx;
+            }
+            x1 += stepx;
+            fraction += dy;
+
+            glcd_putPixel(x1, y1, colour);
+        }
+    }
+    else
+    {
+        fraction = (dx - (dy >> 1));
+
+        while(y1 != y2)
+        {
+            if (fraction >= 0)
+            {
+                x1 += stepx;
+                fraction -= dy;
+            }
+            y1 += stepy;
+            fraction += dx;
+            glcd_putPixel(x1, y1, colour);
+        }
+    }
 }
 
 void glcd_circle(uint8_t x0, uint8_t y0, uint8_t r, glcd_color_t color)
 {
-
 }
 
 void glcd_rect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, glcd_color_t color)
 {
-
+   glcd_line(x0,y0,x1,y0,GLCD_COLOR_BLACK);
+   glcd_line(x1,y0,x1,y1,GLCD_COLOR_BLACK);
+   glcd_line(x0,y1,x1,y1,GLCD_COLOR_BLACK);
+   glcd_line(x0,y0,x0,y1,GLCD_COLOR_BLACK);
 }
 
 void glcd_fillRect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, glcd_color_t color)
@@ -120,14 +190,39 @@ void glcd_clearScreen(glcd_color_t color)
    }
 }
 
-void glcd_putString(uint8_t x, uint8_t y, uint8_t *pStr, glcd_color_t fb, glcd_color_t bg)
+void glcd_putString(uint8_t x, uint8_t y, uint8_t *string)
 {
-
+     do
+     {
+         glcd_putChar(x, y, *string++);
+         x += 0x06;
+     }while((*string >= 0x20) && (*string <= 0x7F));
 }
 
-uint8_t glcd_putChar(uint8_t x, uint8_t y, uint8_t ch, glcd_color_t fb, glcd_color_t bg)
+uint8_t glcd_putChar(uint8_t x, uint8_t y, char ch)
 {
+   uint8_t i,j,value;
+     for(i = 0x00; i < 0x05; i++)
+     {
+         for(j = 0x00; j < 0x08; j++)
+         {
+             value = 0x0000;
+             value = ((font[((uint8_t)ch) - 0x20][i]));
 
+             if(((value >> j) & 0x01) != 0x00)
+             {
+                 glcd_putPixel(x, y, 0);
+             }
+   //          else
+   //          {
+   //              glcd_putPixel(x, y, GLCD_COLOR_WHITE);
+   //          }
+
+             y -= 1;
+          }
+          y += 8;
+          x++;
+      }
 }
 
 /*==================[end of file]============================================*/

@@ -125,10 +125,6 @@ static void glcd_NT7532_cmdWrite(uint8_t cmd)
    wr_buffer = (0x0900 | cmd) << 8;      /* 9 = 1001 */         
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer, 3);     
 
-   //SetRelAlarm(SetEvTon, 1, 0);
-   //WaitEvent(evTon);
-   //ClearEvent(evTon);
-
    /* E to low */
    wr_buffer &= 0x0007FFFF;
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);
@@ -146,8 +142,6 @@ static void glcd_NT7532_dataWrite(uint8_t data)
    /* E to low */
    wr_buffer &= 0x0007FFFF;
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);
-  
-//ciaaPOSIX_usleep(10000);
 } 
 
 static void glcd_NT7532_init()
@@ -159,9 +153,6 @@ static void glcd_NT7532_init()
    ciaaPOSIX_write(ciaaLcd_fd, &wr_buffer , 3);     
 
    ciaaPOSIX_usleep(10000);
-   //SetRelAlarm(SetEvTon, 10, 0);
-   //WaitEvent(evTon);
-   //ClearEvent(evTon);
 
    glcd_NT7532_cmdWrite(NT7532_CMD_INTERNAL_RST);
    glcd_NT7532_cmdWrite(NT7532_CMD_SET_BIAS_9);                         // LCD Bias Select
@@ -177,11 +168,6 @@ static void glcd_NT7532_init()
    glcd_NT7532_cmdWrite(NT7532_CMD_SET_DISP_START_LINE);                // Initial Display Line
 
    ciaaPOSIX_usleep(10000);
-	//SetRelAlarm(SetEvTon, 10, 0);
-	//WaitEvent(evTon);
-	//ClearEvent(evTon);
-//   CMD(NT7532_CMD_SET_ALLPTS_NORMAL);
-//   st7565SetBrightness(0x18);
 }
 
 static void glcd_NT7532_setPage(uint8_t page)
@@ -207,7 +193,6 @@ extern glcdModuleType * glcd_addDriver(void)
 //   glcd_device = &glcd_NT7532; 
 //   ciaaPOSIX_printf("glcd_addDriver()\n");
 //}
-
 
 extern void ciaaLcd_NT7532_refresh()
 {

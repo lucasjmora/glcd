@@ -92,9 +92,9 @@ void glcd_circle(uint8_t x0, uint8_t y0, uint8_t r, glcd_color_t color);
 void glcd_rect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, glcd_color_t color);
 void glcd_fillRect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, glcd_color_t color);
 void glcd_clearScreen(glcd_color_t color);
-void glcd_putString(uint8_t x, uint8_t y, uint8_t *pStr, glcd_color_t fb,
-        glcd_color_t bg);
-uint8_t glcd_putChar(uint8_t x, uint8_t y, uint8_t ch, glcd_color_t fb, glcd_color_t bg);
+void glcd_putString(uint8_t x, uint8_t y, uint8_t *string);
+uint8_t glcd_putChar(uint8_t x, uint8_t y, char ch);
+//uint8_t glcd_putChar(uint8_t x, uint8_t y, uint8_t ch, glcd_color_t fb, glcd_color_t bg);
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }

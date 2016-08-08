@@ -136,10 +136,19 @@ TASK(InitTask)
    glcd_init();
    
 //   ciaaLcd_NT7532_refresh();
-   glcd_clearScreen(GLCD_COLOR_BLACK);
-   ciaaLcd_NT7532_refresh();
+   glcd_clearScreen(GLCD_COLOR_WHITE);
+   //ciaaLcd_NT7532_refresh();
    //glcd_putPixel(61,61,0); 
-   //glcd_putPixel(60,0,0); 
+   //glcd_putPixel(60,1,0); 
+   //glcd_putPixel(60,3,0); 
+   glcd_putPixel(1,1,0); 
+   glcd_putChar(10,50,'T');
+   glcd_putString(10,15,"Lucas");
+   //glcd_line(2,50,100,2,0);
+   //glcd_line(50,50,100,50,0);
+   //glcd_line(100,50,100,2,0);
+   glcd_rect(50,50,100,5,0);
+   ciaaLcd_NT7532_refresh();
    //glcd_putPixel(100,0,0); 
    
 //   uint8_t pix,piy=63;
